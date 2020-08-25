@@ -1,0 +1,124 @@
+<apex:page controller="MassLeadConverterController" id="pg" tabStyle="Lead" sidebar="false" title="Mass Convert Leads - Select Contacts">
+<!-- This Visualforce page was not written by me and is provided purely for the context of the MassLeadConverterController class. -->     
+<script>
+    function backToList()
+        {
+            location.href = '/00Q';
+            return false;
+        }
+        
+        function disableElements() {
+            var x=document.getElementsByTagName('select');
+            var z = new Array();
+            var o = new Array();
+            if (x != null) {
+            console.log('---'+ x.length);
+              for(var j = 0; j< x.length; j++){
+                    var selectedText = x[j].options[x[j].selectedIndex].text.replace('Create New Contact: ','').replace('Attach To Existing: ','');
+                    z.push(selectedText);
+                    o.push(x[j].parentNode);
+                    console.log('---'+selectedText);
+              }
+               for(var k = 0; k< o.length; k++){
+                   o[k].innerHTML = z[k];
+                   console.log('---'+z[k]);
+               }
+            }
+        }
+</script>
+
+<style>
+        .leadTab .bPageBlock {
+            border-top: 0px solid #e39321 !important;
+        }
+        
+        .leadBlock .tertiaryPalette{
+         background-color: #33790C !important;
+        }
+        
+    </style>
+<!-- Section Header -->
+    <apex:form id="frm">
+    <apex:sectionHeader title="Mass Convert Leads" subtitle="{!IF(getLstResult.Size > 0,'Results','Contact Selection')}"/>
+
+          <div class="bWizardBlock tertiaryPalette" style="padding-bottom:60px;background:#f8f8f8 none;">
+            <div class="pbWizardTitle tertiaryPalette brandTertiaryBgr" >
+                <div class="ptRightTitle">
+                    {!IF(getLstResult.Size > 0,'','Step 2 of 2')}
+                </div>
+                <h2>
+                {!IF(getLstResult.Size > 0,'Leads conversion results','Step 2.  Create a new contact or update the existing contact.')}
+            </h2>
+            </div>
+        <apex:pageBlock id="pb" >
+         <apex:pageBlockButtons style="float:right" location="top">
+        <apex:actionStatus startText="Please wait..."  id="theStatus1">
+            
+            <apex:facet name="stop">
+                <apex:commandButton value="Convert" action="{!massConvertRecords}" oncomplete="javascript:disableElements();" status="theStatus1" reRender="frm,theStatus1" rendered="{!IF(getLstResult.Size > 0,false,true)}"/>
+                </apex:facet>
+                <apex:facet name="start">
+                 <apex:commandButton status="theStatus" value="Converting..." disabled="true" />
+                
+            </apex:facet>
+            </apex:actionStatus>
+            <apex:commandButton value="Previous"  action="{!step1}"   rendered="{!IF(getLstResult.Size > 0,false,true)}"/>
+            <apex:commandButton value="Back To Leads List"   onClick="return backToList();"/>
+           
+       
+            </apex:pageBlockButtons>
+            <apex:pageBlockButtons style="float:right" location="bottom">
+        <apex:actionStatus startText="Please wait..."  id="theStatus2">
+            
+            <apex:facet name="stop">
+                <apex:commandButton value="Convert" action="{!massConvertRecords}" oncomplete="javascript:disableElements();" status="theStatus2" reRender="frm,theStatus2" rendered="{!IF(getLstResult.Size > 0,false,true)}"/>
+                </apex:facet>
+                <apex:facet name="start">
+                 <apex:commandButton status="theStatus2" value="Converting..." disabled="true" />
+                
+            </apex:facet>
+            </apex:actionStatus>
+            <apex:commandButton value="Previous"  action="{!step1}"  rendered="{!IF(getLstResult.Size > 0,false,true)}"/>
+            <apex:commandButton value="Back To Leads List"  onClick="return backToList();"/>
+           
+       
+            </apex:pageBlockButtons>
+           
+                <apex:pageBlockTable style="margin-bottom:20px" value="{!listConvertParameters}" id="pbt" var="item" >
+                    <apex:column headerValue="Account Name">
+                        <apex:outputLabel value="{!item.accountName}" /> 
+                    </apex:column>
+                    <apex:column headerValue="Contact Name">
+                        <apex:outputLabel value="{!item.contactName}" rendered="{!IF(item.listContact.Size > 1,false,true)}"/>
+                        <apex:outputPanel >
+                            <div class="requiredInput">
+                                <div class="requiredBlock"/>
+                                <apex:selectList value="{!item.selectedContactName}" size="1" multiselect="false" rendered="{!IF(item.listContact.Size > 1,true,false)}">
+                                    <apex:selectOptions value="{!item.listContact}" />
+                                </apex:selectList>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:column>
+                </apex:pageBlockTable>
+            <apex:pageBlockSection collapsible="false" columns="1" title="Results" rendered="{!IF(getLstResult.Size > 0,true,false)}">
+                <B><apex:outputLabel value="{!successRecordCounter} record(s) converted successfully" rendered="{!IF(successRecordCounter = 0,false,true)}"></apex:outputLabel></B>
+                <B><apex:outputLabel value="{!failureRecordCounter} record(s) could not be converted." rendered="{!IF(failureRecordCounter = 0,false,true)}"></apex:outputLabel></B>
+            </apex:pageBlockSection>
+                
+            <apex:pageBlockSection collapsible="false" columns="1" title="Details" rendered="{!IF(getLstResult.Size > 0,true,false)}">
+                <apex:pageBlockTable value="{!getLstResult}" var="item" >
+                    
+                    <apex:column headerValue="Lead(Name-Company)">
+                        <apex:outputLabel value="{!item.leadInfo}"/>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Results">
+                        <apex:outputLabel value="{!item.resultMessage}"/>
+                    </apex:column>
+                    
+                </apex:pageBlockTable>
+                </apex:pageBlockSection>
+        </apex:pageBlock>
+        </div>
+    </apex:form>
+</apex:page>
