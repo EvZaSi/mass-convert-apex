@@ -10,5 +10,7 @@ After some initial digging in Salesforce, I found that the Visualforce pages for
 2. Understand how the Visualforce page represented the group of selected Leads in the pageBlockTable element
 3. Take note of which attributes the Visualforce page allowed the user to mutate in the representation of these Leads
 4. Understand how all of the controller methods fit together upon use by the end-user
+5. Create an outline structure for my controller and related classes before beginning writing the Apex
+6. Write the Apex!
 
 The project was a success in the end and we were able to save some money by pivoting to this home-brew soution!
